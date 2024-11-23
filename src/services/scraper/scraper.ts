@@ -65,32 +65,33 @@ class UPIICSAScraper {
     }
   }
 
-  public async scrapeAll(): Promise<Map<string, ScrapedPage>> {
-    try {
-      console.log("Starting scraping process...");
-      
-      // Obtener las URLs dinámicamente desde las reglas de inclusión configuradas
-      const mainPages = SCRAPING_RULES.includePatterns.map((pattern) =>
-        pattern instanceof RegExp
-          ? pattern.source.replace(/^\/|\$$/g, "") // Limpia la RegExp para obtener URLs base
-          : pattern
-      ).map((endpoint) => `${UPIICSA_BASE_URL}/${endpoint}`);
-  
-      // Procesar cada URL
-      for (const url of mainPages) {
-        if (!this.visitedUrls.has(url)) {
-          console.log(`Scraping URL: ${url}`);
-          await this.scrapePage(url);
-        }
+public async scrapeAll(): Promise<Map<string, ScrapedPage>> {
+  try {
+    console.log("Starting scraping process...");
+
+    const mainPages = SCRAPING_RULES.includePatterns.map((pattern) =>
+      pattern instanceof RegExp
+        ? pattern.source.replace(/^\/|\$$/g, "") // Limpia la RegExp para obtener URLs base
+        : pattern
+    ).map((endpoint) => `${UPIICSA_BASE_URL}/${endpoint}`);
+
+    console.log("Generated URLs:", mainPages);
+
+    for (const url of mainPages) {
+      if (!this.visitedUrls.has(url)) {
+        console.log(`Scraping URL: ${url}`);
+        await this.scrapePage(url);
       }
-  
-      console.log(`Scraping completed. Processed ${this.results.size} pages.`);
-      return this.results;
-    } catch (error) {
-      console.error("Error during scraping:", error);
-      throw error;
     }
+
+    console.log(`Scraping completed. Processed ${this.results.size} pages.`);
+    return this.results;
+  } catch (error) {
+    console.error("Error during scraping:", error);
+    throw error;
   }
+}
+
   
   public getResults(): Map<string, ScrapedPage> {
     return this.results;
